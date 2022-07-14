@@ -1,12 +1,3 @@
-# Go Open Telemetry Instrumentation for GCP
-
-A collection of 3rd party packages for use with GCP & [Open Telemetry Go](https://github.com/open-telemetry/opentelemetry-go)
-
-## PubSub
-
-Trace messages received by a subscription using the implementation below.
-
-```go
 package main
 
 import (
@@ -14,20 +5,31 @@ import (
 	"context"
 	"github.com/tommbee/opentelemetry-go-gcp-instrumentations/otelpubsub"
 	"log"
+	"os"
 )
 
 func main() {
 	InitTracer()
 	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, "example-project")
+	client, err := pubsub.NewClient(ctx, os.Getenv("GOOGLE_CLOUD_PROJECT"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	
-	pubSubSub := client.Subscription("example-subscription")
+
+	topicName := os.Getenv("PUBSUB_TOPIC")
+	topic, err := GetTopic(client, topicName)
+	if err != nil {
+		log.Println(err)
+	}
+
+	subName := os.Getenv("PUBSUB_SUBSCRIPTION_NAME")
+	pubSubSub, ex := GetSubscription(client, subName, topic)
+	if ex != nil {
+		log.Println(err)
+	}
+
 	sub := otelpubsub.NewSubscriptionWithTracing(pubSubSub)
-	
 	e := sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
 		log.Printf("Got message: %q\n", string(m.Data))
 		m.Ack()
@@ -36,4 +38,3 @@ func main() {
 		log.Println(err)
 	}
 }
-```

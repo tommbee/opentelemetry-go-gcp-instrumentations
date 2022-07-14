@@ -1,8 +1,6 @@
-# Go Open Telemetry Instrumentation for GCP
+# PubSub Instrumentation
 
-A collection of 3rd party packages for use with GCP & [Open Telemetry Go](https://github.com/open-telemetry/opentelemetry-go)
-
-## PubSub
+## Subscriptions
 
 Trace messages received by a subscription using the implementation below.
 
