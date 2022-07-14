@@ -1,16 +1,24 @@
-Version := $(shell git describe --tags --dirty)
-#GitCommit := $(shell git rev-parse HEAD)
-#LDFLAGS := "-s -w -X main.Version=$(Version) -X main.GitCommit=$(GitCommit)"
-
 export GO111MODULE=on
 
 .PHONY: all
-all: gofmt test
+all: gofmt lint test
 
 .PHONY: test
 test:
-	find . -name go.mod -execdir go test ./... -cover \;
+	go test ./... -cover
 
 .PHONY: gofmt
 gofmt:
-	@test -z $(shell gofmt -l -s $(SOURCE_DIRS) ./ | tee /dev/stderr) || (echo "[WARN] Fix formatting issues with 'make fmt'" && exit 1)
+	@diff=$$(gofmt -s -d ./); \
+	if [ -n "$$diff" ]; then \
+		echo "Please run 'make fmt' and commit the result:"; \
+		echo "$${diff}"; \
+		exit 1; \
+	fi;
+
+.PHONY: lint
+lint:
+	@hash golint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) get -u golang.org/x/lint/golint; \
+	fi
+	for PKG in $(PACKAGES); do golint -set_exit_status $$PKG || exit 1; done;
