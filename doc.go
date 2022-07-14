@@ -1,1 +1,1 @@
-package opentelpubsub
+package otelpubsub

@@ -1,1 +1,1 @@
-# opentelemetry-go-pubsub
+# open-telemetry-go-pubsub

@@ -1,54 +1,61 @@
-package opentelpubsub
+package otelpubsub
 
 import (
 	"cloud.google.com/go/pubsub"
 	"context"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/semconv/v1.10.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
+const tracerName = "github.com/tommbee/otelpubsub"
+
 type Subscription struct {
-	pubsub.Subscription
+	*pubsub.Subscription
+	*config
 }
 
-type PubSubCarrier struct {
-	message *pubsub.Message
-}
-
-// Receive calls the configured subscription to trigger the callback on message received.
-func (t *Subscription) Receive(ctx context.Context, f func(context.Context, *pubsub.Message)) {
-	t.Receive(ctx, f)
-}
-
-// NewPubsubCarrier creates a new PubSubCarrier.
-func NewPubsubCarrier(msg *pubsub.Message) PubSubCarrier {
-	return PubSubCarrier{message: msg}
-}
-
-// Get returns the value for a given key
-func (c PubSubCarrier) Get(key string) string {
-	return c.message.Attributes[key]
-}
-
-// Set sets an attribute.
-func (c PubSubCarrier) Set(key, val string) {
-	c.message.Attributes[key] = val
-}
-
-// Keys returns a slice of all keys in the carrier.
-func (c PubSubCarrier) Keys() []string {
-	i := 0
-	out := make([]string, len(c.message.Attributes))
-	for k := range c.message.Attributes {
-		out[i] = k
-		i++
+// NewSubscriptionWithTracing creates a new instrumented pubsub.Subscription.
+func NewSubscriptionWithTracing(sub *pubsub.Subscription, opts ...Option) Subscription {
+	cfg := config{}
+	for _, opt := range opts {
+		opt.apply(&cfg)
 	}
-	return out
+	if cfg.tracerProvider == nil {
+		cfg.tracerProvider = otel.GetTracerProvider()
+	}
+	if cfg.propagators == nil {
+		cfg.propagators = otel.GetTextMapPropagator()
+	}
+	return Subscription{sub, &cfg}
 }
 
-func PubSubMessageInjectContext(ctx context.Context, msg *pubsub.Message) {
-	otel.GetTextMapPropagator().Inject(ctx, NewPubsubCarrier(msg))
-}
+// Receive starts a new span before executing the given callback function.
+func (t *Subscription) Receive(ctx context.Context, f func(ctx context.Context, m *pubsub.Message)) error {
+	subscriptionName := t.Subscription.String()
+	tracer := t.config.tracerProvider.Tracer(
+		tracerName,
+		trace.WithInstrumentationVersion(SemVersion()),
+	)
 
-func PubSubMessageExtractContext(ctx context.Context, msg *pubsub.Message) context.Context {
-	return otel.GetTextMapPropagator().Extract(ctx, NewPubsubCarrier(msg))
+	instrumented := func(msgCtx context.Context, m *pubsub.Message) {
+		ctx := PubSubMessageExtractContext(msgCtx, m)
+		attributes := []attribute.KeyValue{
+			semconv.CloudProviderGCP,
+			semconv.MessagingOperationReceive,
+			semconv.MessagingDestinationKindTopic,
+			semconv.MessagingMessageIDKey.String(m.ID),
+			semconv.MessagingDestinationKey.String(subscriptionName),
+			semconv.MessagingProtocolKey.String("pubsub"),
+		}
+		opts := []trace.SpanStartOption{
+			trace.WithSpanKind(trace.SpanKindConsumer),
+			trace.WithAttributes(attributes...),
+		}
+		ctx, span := tracer.Start(ctx, subscriptionName+" process", opts...)
+		defer span.End()
+		f(ctx, m)
+	}
+	return t.Subscription.Receive(ctx, instrumented)
 }

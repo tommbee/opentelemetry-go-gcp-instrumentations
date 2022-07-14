@@ -1,10 +1,11 @@
-module github.com/tommbee/opentelpubsub
+module github.com/tommbee/otelpubsub
 
 go 1.18
 
 require (
 	cloud.google.com/go/pubsub v1.23.1
 	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel/trace v1.8.0
 )
 
 require (
@@ -19,7 +20,6 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/otel/trace v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9 // indirect
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
