@@ -16,7 +16,7 @@ services:
 
   subscriber:
     build:
-      dockerfile: $PWD/Dockerfile
+      dockerfile: $PWD/subscriber/Dockerfile
       context: ../
       target: example-subscriber
     environment:
@@ -35,7 +35,7 @@ services:
 
   publisher:
     build:
-      dockerfile: $PWD/Dockerfile
+      dockerfile: $PWD/publisher/Dockerfile
       context: ../
       target: example-publisher
     environment:

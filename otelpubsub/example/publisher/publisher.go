@@ -3,6 +3,7 @@ package main
 import (
 	"cloud.google.com/go/pubsub"
 	"context"
+	"github.com/tommbee/opentelemetry-go-gcp-instrumentations/otelpubsub/example"
 	"log"
 	"os"
 )
@@ -16,7 +17,7 @@ func main() {
 	defer client.Close()
 
 	topicName := os.Getenv("PUBSUB_TOPIC")
-	t, err := GetTopic(client, topicName)
+	t, err := example.GetTopic(client, topicName)
 	if err != nil {
 		log.Fatal(err)
 	}
