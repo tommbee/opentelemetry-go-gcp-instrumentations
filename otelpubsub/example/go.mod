@@ -2,11 +2,11 @@ module github.com/tommbee/opentelemetry-go-gcp-instrumentations/otelpubsub/examp
 
 go 1.18
 
-replace github.com/tommbee/opentelemetry-go-gcp-instrumentations/otelpubsub => ../
+replace github.com/tommbee/opentelemetry-go-gcp-instrumentations => ../../
 
 require (
 	cloud.google.com/go/pubsub v1.23.1
-	github.com/tommbee/opentelemetry-go-gcp-instrumentations/otelpubsub v0.0.0-00010101000000-000000000000
+	github.com/tommbee/opentelemetry-go-gcp-instrumentations v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.8.0
 	go.opentelemetry.io/otel/sdk v1.8.0

@@ -1,6 +1,6 @@
 FROM golang:1.18-alpine AS base
 COPY . /src/
-WORKDIR /src/example/subscriber
+WORKDIR /src/otelpubsub/example/subscriber
 
 FROM base AS example-subscriber
 RUN go install ./subscriber.go

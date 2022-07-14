@@ -1,1 +1,0 @@
-package opentelemetry_go_gcp_instrumentations

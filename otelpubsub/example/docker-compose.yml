@@ -17,7 +17,7 @@ services:
   subscriber:
     build:
       dockerfile: $PWD/subscriber/Dockerfile
-      context: ../
+      context: ../../
       target: example-subscriber
     environment:
       GOOGLE_CLOUD_PROJECT: 'example-pubsub'
@@ -36,7 +36,7 @@ services:
   publisher:
     build:
       dockerfile: $PWD/publisher/Dockerfile
-      context: ../
+      context: ../../
       target: example-publisher
     environment:
       GOOGLE_CLOUD_PROJECT: 'example-pubsub'
