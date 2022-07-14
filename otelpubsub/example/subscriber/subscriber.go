@@ -30,7 +30,7 @@ func main() {
 		log.Println(err)
 	}
 
-	sub := otelpubsub.NewSubscriptionWithTracing(pubSubSub)
+	sub := otelpubsub.SubscriptionWithTracing(pubSubSub)
 	e := sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
 		log.Printf("Got message: %q\n", string(m.Data))
 		m.Ack()

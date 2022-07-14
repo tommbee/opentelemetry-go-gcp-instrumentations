@@ -16,8 +16,8 @@ type Subscription struct {
 	*config
 }
 
-// NewSubscriptionWithTracing creates a new instrumented pubsub.Subscription.
-func NewSubscriptionWithTracing(sub *pubsub.Subscription, opts ...Option) Subscription {
+// SubscriptionWithTracing creates a new instrumented pubsub.Subscription.
+func SubscriptionWithTracing(sub *pubsub.Subscription, opts ...Option) Subscription {
 	cfg := config{}
 	for _, opt := range opts {
 		opt.apply(&cfg)
