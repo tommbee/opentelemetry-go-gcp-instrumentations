@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  pubsub:
+    container_name: example-pubsub
+    image: google/cloud-sdk:392.0.0-emulators
+    entrypoint: gcloud beta emulators pubsub start --host-port=0.0.0.0:8681 --project=example-pubsub
+    healthcheck:
+      test: curl --fail http://localhost:8681 || exit 1
+      interval: 2s
+      timeout: 1s
+      retries: 10
+      start_period: 1s
+    networks:
+      - otelpubsub-example
+
+  subscriber:
+    build:
+      dockerfile: $PWD/Dockerfile
+      context: ../
+      target: example-subscriber
+    environment:
+      GOOGLE_CLOUD_PROJECT: 'example-pubsub'
+      PUBSUB_EMULATOR_HOST: 'example-pubsub:8681'
+      PUBSUB_TOPIC: 'example-topic'
+      PUBSUB_SUBSCRIPTION_NAME: 'example-topic-subscription'
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "/go/bin/subscriber"
+    depends_on:
+      - pubsub
+    networks:
+      - otelpubsub-example
+
+  publisher:
+    build:
+      dockerfile: $PWD/Dockerfile
+      context: ../
+      target: example-publisher
+    environment:
+      GOOGLE_CLOUD_PROJECT: 'example-pubsub'
+      PUBSUB_EMULATOR_HOST: 'example-pubsub:8681'
+      PUBSUB_TOPIC: 'example-topic'
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "/go/bin/publisher"
+    depends_on:
+      - pubsub
+    networks:
+      - otelpubsub-example
+
+networks:
+  otelpubsub-example:
+    driver: bridge
