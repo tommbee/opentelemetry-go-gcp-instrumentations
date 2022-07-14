@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	InitTracer()
 	ctx := context.Background()
 	client, err := pubsub.NewClient(ctx, "example-project")
 	if err != nil {
