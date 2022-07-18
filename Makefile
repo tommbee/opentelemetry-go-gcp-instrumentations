@@ -1,7 +1,7 @@
 export GO111MODULE=on
 
 .PHONY: all
-all: gofmt lint test
+all: gofmt test
 
 .PHONY: test
 test:

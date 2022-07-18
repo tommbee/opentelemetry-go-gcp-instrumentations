@@ -40,7 +40,7 @@ func (t *Subscription) Receive(ctx context.Context, f func(ctx context.Context, 
 	)
 
 	instrumented := func(msgCtx context.Context, m *pubsub.Message) {
-		ctx := PubSubMessageExtractContext(msgCtx, m)
+		ctx := PubSubMessageExtractContext(msgCtx, t.config.propagators, m)
 		attributes := []attribute.KeyValue{
 			semconv.CloudProviderGCP,
 			semconv.MessagingOperationReceive,
