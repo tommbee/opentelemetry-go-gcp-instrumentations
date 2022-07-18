@@ -22,8 +22,11 @@ func main() {
 		log.Fatal(err)
 	}
 	msg := "Hello World"
+	attrs := make(map[string]string)
+	attrs["traceparent"] = "00-6ef0bcb5955b1fe1988191a2272577b1-fd61f692a0fdb179-01"
 	result := t.Publish(ctx, &pubsub.Message{
-		Data: []byte(msg),
+		Data:       []byte(msg),
+		Attributes: attrs,
 	})
 	id, err := result.Get(ctx)
 	if err != nil {

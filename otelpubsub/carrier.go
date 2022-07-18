@@ -3,7 +3,7 @@ package otelpubsub
 import (
 	"cloud.google.com/go/pubsub"
 	"context"
-	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type PubSubMessageCarrier struct {
@@ -37,6 +37,6 @@ func (c PubSubMessageCarrier) Keys() []string {
 }
 
 // PubSubMessageExtractContext sets NewPubSubMessageCarrier as an "extract" concern for the global propagator
-func PubSubMessageExtractContext(ctx context.Context, msg *pubsub.Message) context.Context {
-	return otel.GetTextMapPropagator().Extract(ctx, NewPubSubMessageCarrier(msg))
+func PubSubMessageExtractContext(ctx context.Context, propagator propagation.TextMapPropagator, msg *pubsub.Message) context.Context {
+	return propagator.Extract(ctx, NewPubSubMessageCarrier(msg))
 }
