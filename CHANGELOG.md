@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/tommbee/opentelemetry-go-gcp-instrumentations/compare/v1.0.0...v1.1.0) (2022-07-18)
+
+
+### Features
+
+* finished unit testing ([3682544](https://github.com/tommbee/opentelemetry-go-gcp-instrumentations/commit/3682544f2e686691cd3bf5abe5bd722e7191decb))
+
 ## 1.0.0 (2022-07-14)
 
 
