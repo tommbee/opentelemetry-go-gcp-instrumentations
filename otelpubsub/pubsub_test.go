@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"testing"
 )
@@ -32,7 +33,8 @@ func TestSubscription_Receive(t *testing.T) {
 	client, err := pubsub.NewClient(ctx, "test-project",
 		option.WithEndpoint(srv.Addr),
 		option.WithoutAuthentication(),
-		option.WithGRPCDialOption(grpc.WithInsecure()))
+		option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())))
+	assert.Nil(t, err)
 	defer client.Close()
 	defer srv.Close()
 
